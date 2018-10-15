@@ -1,3 +1,6 @@
+#To run the contactless temp sensor SHT31-D 
+#Measures temp after every 3 seconds
+
 import smbus
 import time
 
