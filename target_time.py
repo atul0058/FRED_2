@@ -1,3 +1,5 @@
+#We know the time at which the workpiece enters,and target time is the time at which the workpiece will reach the desired temp 
+
 import datetime
 import time
 import math
