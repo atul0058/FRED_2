@@ -1,3 +1,6 @@
+#Script to measure temp using contactless temp sensor SHT31-D 
+
+
 import smbus
 import time
 
