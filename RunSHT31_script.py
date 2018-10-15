@@ -1,4 +1,7 @@
-#!/usr/bin/env python
+"""
+This script is intended to make the database for the project FRED. It shows the initial temp of the workpiece, time of entry, 
+time at which it will get cooled, it's status(whether it has reached it's desired temp or not), and it's location.
+"""
 
 import os
 import time
