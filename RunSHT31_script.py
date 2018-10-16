@@ -54,7 +54,7 @@ while True:
             cTemp = -45 + (175*temp/65535.0)
             d1= (time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:%S"))
             
-            sql = ("""INSERT INTO t2(Date_and_Time,Temperature,Target_Time,Status,Location) VALUES (%s,%s,%s,%s,%s,%s)""",(d1,cTemp,target_time(cTemp),status(),location()))
+            sql = ("""INSERT INTO t2(Date_and_Time,Temperature,Target_Time,Status,Location) VALUES (%s,%s,%s,%s,%s)""",(d1,cTemp,target_time(cTemp),status(),location()))
             try:
                 cur.execute(*sql)
                 db.commit()
