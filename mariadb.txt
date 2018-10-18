@@ -1,0 +1,7 @@
+#to open mysql in pi.
+sudo mysql -u root
+
+use test1; #test1 is the name of the database
+
+#name of the table is test2 and it has 8 coloumns-Id, Date and Time, Temperature, Target Time, Status, Shelf, Row and Column
+create table test2(Id mediumint auto_increment not null, Date_and_Time datetime not null, Temperature float(5,2) not null, Target_Time DateTime not null, Status boolean not null, Shelf int not null, Row int not null, Column int not null, Primary Key (Id));
