@@ -13,7 +13,7 @@ client = ModbusClient(host = '192.168.178.10',port  = 502)          ##Modbus con
 client.connect()                                                    ##Open COnnection
 
 ## find a way to make a database here itself from python 
-
+Withe 
 x=input("How long to wait between each reading? (in seconds)= ")
 
 def cooling_time(Ti):
@@ -68,7 +68,10 @@ def rcv_location():
     return location
 
 db = MySQLdb.connect(host="localhost", user="raspi", passwd="raspberry", db="test1")
-cur = db.cursor()
+cursor = db.cursor()
+
+table = 'create table runtime (Id mediumint primary key auto increment, Date_and_Time datetime, Temp float Target_Time datetime, Status BOOl, Shelf int, Row Int, Row_Place)'
+cursor.execute(table)
 
 ##infinite loop for status updation
 while True:
@@ -99,13 +102,25 @@ while True:
     try:
         while True:
             '''
+            ## Find a way to trigger this only uwhen the workpiece comes 
+            Probably this variable turns on when the promity sensor kicks in and then use a counter to just take the reading once 
+
             bus=smbus.SMBus(1)
             bus.write_i2c_block_data(0x44, 0x2c, [0x06])
             time.sleep(0.5)
             data = bus.read_i2c_block_data(0x44, 0x00, 6)
             temp=data[0] * 256 + data[1]
             cTemp = -45 + (175*temp/65535.0)
+            
             '''
+            then loop this on when the next workpiece comes in 
+
+            while True:
+                if xProximity ==1 :
+                    sensor.read()
+                    break()
+            break()
+
             d1= (time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:%S"))
             ## Add a logic for trigger for recieving location
             z=input("What is the initial temperature= ")
