@@ -36,12 +36,9 @@ def target_time(Ti):
     
     d1= datetime.datetime.now()
     delta_t=cooling_time(Ti)
-    new_time=d1 + datetime.timedelta(0,delta_t)
-    ##Add 40 minutes to the final reading
+    new_time=d1 + datetime.timedelta(0,delta_t)+2400
+    ##The system takes 40 minutes to reach the desiredd temperature
     return new_time
-
-def status():                                                       ##All statuses intialised to zero
-    return 0
 
 def shelf():
     rr_shelf = client.read_input_registers(0,1)   
@@ -77,6 +74,25 @@ def sensor_read():
 db = MySQLdb.connect(host="localhost", user="raspi", passwd="raspberry", db="test1")
 cursor = db.cursor()
 
+def status():					##All statuses intialised to zero
+	status='UPDATE Status=1 where Current_TIMESTAMP >= Target_Time'
+	return cursor.execute(status)
+
+	#how to run two while loops at the same time
+	
+	"""
+	send_location='select location from test1 where status=1'
+	cursor.execute(send_location)
+	x=[]
+	for i in cursor:
+		x=x.append(i[0])
+	#x is the list of all the locations which has to be sent to the PLC
+	"""
+def removefromdb():
+	remove='DELETE FROM test1 WHERE status =1'
+	return cursor.execute(remove)
+
+	
 #Create the Table. These settings are temp 
 table = 'create table runtime Id mediumint primary key auto increment, Date_and_Time datetime, Temp float Target_Time datetime, Status BOOl, Shelf int, Row Int, Row_Place'
 cursor.execute(table)
@@ -95,7 +111,7 @@ if mode ==0:
 		rec_reg = client.read_input_registers(y,1)
 		xRec = rec_reg.getRegister(0)
 		if xRec == 1:
-			sensor.read()
+			sensor_read()
 			database.add_row()
 		if mode ==1:Break()
 
