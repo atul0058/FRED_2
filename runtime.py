@@ -71,6 +71,10 @@ def add_row(temp, location): verify this query
     query = 'insert into test1(Date_and_Time, Temp, Target_Time, Status, Location) values (%s,%d,%s,%d,%d)'% (current_date_and_time, temp,Target_Time(temp),0,location())
     return cursor.execute(query)
 
+def removefromdb():
+	remove='DELETE TOP (1) FROM test1 WHERE status =1'   
+	return cursor.execute(remove)
+    
 #Modbus Connection initialise 
 client = ModbusClient(host = '192.168.178.10',port  = 502)          ##Modbus connection establish 
 client.connect() 
@@ -102,4 +106,4 @@ while True:
             xDone = read_register(z)
             if xDone == 1:
                 break
-        remove(##only the first element with status == 1 and has been removed already from cpps)##this is the last query
+        removefromdb()##only the first element with status == 1 and has been removed already from cpps)##this is the last query
