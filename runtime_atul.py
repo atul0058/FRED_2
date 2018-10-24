@@ -93,7 +93,7 @@ def status():					##All statuses intialised to zero
 	#x is the list of all the locations which has to be sent to the PLC
 	"""
 def removefromdb():
-	remove='DELETE FROM test1 WHERE status =1'    #I only want to remove the first element which ahs been unstored not all.
+	remove='DELETE TOP (1) FROM test1 WHERE status =1'    #I only want to remove the first element which ahs been unstored not all.
 	return cursor.execute(remove)
 
 	
