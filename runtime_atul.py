@@ -68,8 +68,9 @@ def sensor_read():
     	temp=data[0] * 256 + data[1]
     	cTemp = -45 + (175*temp/65535.0)
 	return cTemp
-
-    
+def add_row:
+	query = ''
+	return cursor.execute(query)
 # Connect with DB
 db = MySQLdb.connect(host="localhost", user="raspi", passwd="raspberry", db="test1")
 cursor = db.cursor()
