@@ -68,12 +68,15 @@ def sensor_read():
     	temp=data[0] * 256 + data[1]
     	cTemp = -45 + (175*temp/65535.0)
 	return cTemp
-def add_row:
-	query = ''
-	return cursor.execute(query)
+
 # Connect with DB
 db = MySQLdb.connect(host="localhost", user="raspi", passwd="raspberry", db="test1")
 cursor = db.cursor()
+
+def add_row:
+	query = 'insert into test1(Date_and_Time, Temp, Target_Time, Status, Shelf, Row , Row_Place) values (current_date_and_time, sensor_read(),Target_Time(),Status(),Shelf(),Row(),Row_Place())
+	return cursor.execute(query)
+
 
 def status():					##All statuses intialised to zero
 	status='UPDATE Status=1 where Current_TIMESTAMP >= Target_Time'
