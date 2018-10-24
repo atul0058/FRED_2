@@ -62,7 +62,7 @@ def sensor_read():
         temp=data[0] * 256 + data[1]
         cTemp = -45 + (175*temp/65535.0)
     return cTemp
-def add_row(temp, location):
+def add_row(temp, location): verufy this query 
     query = 'insert into test1(Date_and_Time, Temp, Target_Time, Status, Shelf, Row , Row_Place) values (%s,%d,%s,%d,%d)'% (current_date_and_time, temp,Target_Time(temp),0,location())
     return cursor.execute(query)
 
@@ -72,7 +72,7 @@ cursor = db.cursor()
 
 #Create the Table. These settings are temp 
 table = 'create table runtime Id mediumint primary key auto increment, Date_and_Time datetime, Temp float Target_Time datetime, Status BOOl, Shelf int, Row Int, Row_Place'
-cursor.execute(table)
+cursor.execute(table) ##verify 
 
 #Modbus Connection initialise 
 client = ModbusClient(host = '192.168.178.10',port  = 502)          ##Modbus connection establish 
@@ -88,11 +88,11 @@ while True:
             xRecognise = read_register(y)
             if xRecognise == 1:
                 break
-        temp = sensor_read()
-        add_row(temp)
+        temp = sensor_read() ##this too
+        add_row(temp)  ##make sure this runs
         
     if mode ==1:
-        update()
+        update() ##this too
         a = list1[0]
         outLocation = a[0]
         s_row_place = send_location%100%10
@@ -105,4 +105,4 @@ while True:
             xDone = read_register(z)
             if xDone == 1:
                 break
-        remove()
+        remove(##only the first element with status == 1 and has been removed already from cpps)##this is the last query
