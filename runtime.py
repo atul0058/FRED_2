@@ -63,17 +63,17 @@ def sensor_read():
 db = MySQLdb.connect(host="localhost", user="raspi", passwd="raspberry", db="test1")
 cursor = db.cursor()
 
-#Create the Table. These settings are temp 
-table = 'create table(Id mediumint auto_increment not null, Date_and_Time datetime not null, Temp float(5,2) not null, Target_Time datetime not null, Status boolean not null, Location int not null, Primary key(Id))'
-cursor.execute(table) ##verify 
 
-def add_row(temp, location): verify this query 
-    query = 'insert into test1(Date_and_Time, Temp, Target_Time, Status, Location) values (%s,%d,%s,%d,%d)'% (current_date_and_time, temp,Target_Time(temp),0,location())
-    return cursor.execute(query)
+def add_row(temp, location): 
+	date_and_time=(time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:%S"))    
+	query = ("""insert into test1(Date_and_Time, Temp, Target_Time, Status, Location) values (%s,%s,%s,%s,%s)""", (date_and_time, temp,Target_Time(temp),0,location())
+	cursor.execute(*query)
+	db.commit()
 
 def removefromdb():
 	remove='DELETE TOP (1) FROM test1 WHERE status =1'   
-	return cursor.execute(remove)
+	cursor.execute(*remove)
+	db.commit()
     
 #Modbus Connection initialise 
 client = ModbusClient(host = '192.168.178.10',port  = 502)          ##Modbus connection establish 
