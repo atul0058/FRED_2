@@ -32,12 +32,10 @@ def cooling_time(Ti):
     return time
 
 def target_time(Ti):
-    
-    
     d1= datetime.datetime.now()
     delta_t=cooling_time(Ti)
-    new_time=d1 + datetime.timedelta(0,delta_t)
-    ##Add 40 minutes to the final reading
+    new_time=d1 + datetime.timedelta(0,delta_t)+2400
+    #FRED takes 2400 seconds to reach the desired temp
     return new_time
 
 def read_register(reg_no):
@@ -52,8 +50,6 @@ def rcv_location():
     location = (shelf*100) + (row*10)+ row_place
     return location
 
-
-
 def sensor_read():
     bus=smbus.SMBus(1)
         bus.write_i2c_block_data(0x44, 0x2c, [0x06])
@@ -62,17 +58,18 @@ def sensor_read():
         temp=data[0] * 256 + data[1]
         cTemp = -45 + (175*temp/65535.0)
     return cTemp
-def add_row(temp, location): verufy this query 
-    query = 'insert into test1(Date_and_Time, Temp, Target_Time, Status, Shelf, Row , Row_Place) values (%s,%d,%s,%d,%d)'% (current_date_and_time, temp,Target_Time(temp),0,location())
-    return cursor.execute(query)
 
 # Connect with DB
 db = MySQLdb.connect(host="localhost", user="raspi", passwd="raspberry", db="test1")
 cursor = db.cursor()
 
 #Create the Table. These settings are temp 
-table = 'create table runtime Id mediumint primary key auto increment, Date_and_Time datetime, Temp float Target_Time datetime, Status BOOl, Shelf int, Row Int, Row_Place'
+table = 'create table(Id mediumint auto_increment not null, Date_and_Time datetime not null, Temp float(5,2) not null, Target_Time datetime not null, Status boolean not null, Location int not null, Primary key(Id))'
 cursor.execute(table) ##verify 
+
+def add_row(temp, location): verify this query 
+    query = 'insert into test1(Date_and_Time, Temp, Target_Time, Status, Location) values (%s,%d,%s,%d,%d)'% (current_date_and_time, temp,Target_Time(temp),0,location())
+    return cursor.execute(query)
 
 #Modbus Connection initialise 
 client = ModbusClient(host = '192.168.178.10',port  = 502)          ##Modbus connection establish 
