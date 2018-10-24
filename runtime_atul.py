@@ -64,6 +64,14 @@ def rcv_location():
     return location
     
 def sensor_read():
+	bus=smbus.SMBus(1)
+    	bus.write_i2c_block_data(0x44, 0x2c, [0x06])
+    	time.sleep(0.5)
+    	data = bus.read_i2c_block_data(0x44, 0x00, 6)
+    	temp=data[0] * 256 + data[1]
+    	cTemp = -45 + (175*temp/65535.0)
+	return cTemp
+
     
 # Connect with DB
 db = MySQLdb.connect(host="localhost", user="raspi", passwd="raspberry", db="test1")
