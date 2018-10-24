@@ -40,33 +40,31 @@ def target_time(Ti):
     ##Add 40 minutes to the final reading
     return new_time
 
-def status():                                                       ##All statuses intialised to zero
-    return 0
-
-def shelf():
-    rr_shelf = client.read_input_registers(0,1)   
-    shelf=rr_shelf.getRegister(0)
-
-    return shelf
-
-def row():
-    rr_row = client.read_input_registers(0,1)   
-    row = rr_row.getRegister(0)
-    return row
-
-def row_place():
-    rr_rowplace = client.read_input_registers(0,1)   
-    row_place =  rr_rowplace.getRegister(0)
-    return row_place 
-
-def rcv_location():
-    location = (shelf()*100) + (row()*10)+ row_place()
-    return location
-
 def read_register(reg_no):
     reg = client.read_input_registers(reg_no,1)
     val = reg.getRegister(0)
     return val
+
+def rcv_location():
+    shelf = read_register(0)
+    row = read_register(1)
+    row_place = read_register(2)
+    location = (shelf*100) + (row*10)+ row_place
+    return location
+
+
+
+def sensor_read():
+    bus=smbus.SMBus(1)
+        bus.write_i2c_block_data(0x44, 0x2c, [0x06])
+        time.sleep(0.5)
+        data = bus.read_i2c_block_data(0x44, 0x00, 6)
+        temp=data[0] * 256 + data[1]
+        cTemp = -45 + (175*temp/65535.0)
+    return cTemp
+def add_row(temp, location):
+    query = 'insert into test1(Date_and_Time, Temp, Target_Time, Status, Shelf, Row , Row_Place) values (%s,%d,%s,%d,%d)'% (current_date_and_time, temp,Target_Time(temp),0,location())
+    return cursor.execute(query)
 
 # Connect with DB
 db = MySQLdb.connect(host="localhost", user="raspi", passwd="raspberry", db="test1")
@@ -77,9 +75,9 @@ table = 'create table runtime Id mediumint primary key auto increment, Date_and_
 cursor.execute(table)
 
 #Modbus Connection initialise 
-	client = ModbusClient(host = '192.168.178.10',port  = 502)          ##Modbus connection establish 
-	client.connect() 
-    client.write_registers(0, [9]*10)                                                  ##Open COnnection
+client = ModbusClient(host = '192.168.178.10',port  = 502)          ##Modbus connection establish 
+client.connect() 
+client.write_registers(0, [9]*10)                                                  ##Open COnnection
 
 #mode :Store = 0, Unstore = 1
 
@@ -90,8 +88,9 @@ while True:
             xRecognise = read_register(y)
             if xRecognise == 1:
                 break
-        sensor()
-        add_row()
+        temp = sensor_read()
+        add_row(temp)
+        
     if mode ==1:
         update()
         a = list1[0]
