@@ -74,7 +74,7 @@ db = MySQLdb.connect(host="localhost", user="raspi", passwd="raspberry", db="tes
 cursor = db.cursor()
 
 def add_row:
-	query = """insert into test1(Date_and_Time, Temp, Target_Time, Status, Shelf, Row , Row_Place) values (%s,%s,%s,%s,%s,%s,%s)""",(current_date_and_time, sensor_read(),Target_Time(),Status(),Shelf(),Row(),Row_Place())
+	query = 'insert into test1(Date_and_Time, Temp, Target_Time, Status, Shelf, Row , Row_Place) values (%s,%s,%s,%s,%s,%s,%s)',(current_date_and_time, sensor_read(),Target_Time(),Status(),Shelf(),Row(),Row_Place())
 	return cursor.execute(query)
 
 
