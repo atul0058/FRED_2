@@ -89,7 +89,7 @@ def status():					##All statuses intialised to zero
 	#x is the list of all the locations which has to be sent to the PLC
 	"""
 def removefromdb():
-	remove='DELETE FROM test1 WHERE status =1'
+	remove='DELETE FROM test1 WHERE status =1'    #I only want to remove the first element which ahs been unstored not all.
 	return cursor.execute(remove)
 
 	
@@ -127,7 +127,9 @@ if mode ==1:
     		client.write_register(0,s_shelf)
     		client.write_register(1,s_row)
     		client.write_register(2,s_row_Place)
-    		if Unstore.done: continue()	
+    		if Unstore.done: continue()
+			#Here we remove that element!
+			
     	#break on mode change 
 
     Break on mode change 
