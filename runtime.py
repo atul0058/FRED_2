@@ -63,6 +63,11 @@ def rcv_location():
     location = (shelf()*100) + (row()*10)+ row_place()
     return location
 
+def read_register(reg_no):
+    reg = client.read_input_registers(reg_no,1)
+    val = reg.getRegister(0)
+    return val
+
 # Connect with DB
 db = MySQLdb.connect(host="localhost", user="raspi", passwd="raspberry", db="test1")
 cursor = db.cursor()
@@ -73,37 +78,32 @@ cursor.execute(table)
 
 #Modbus Connection initialise 
 	client = ModbusClient(host = '192.168.178.10',port  = 502)          ##Modbus connection establish 
-	client.connect()                                                    ##Open COnnection
+	client.connect() 
+    client.write_registers(0, [9]*10)                                                  ##Open COnnection
 
-#Store = 0, Unstore = 1
+#mode :Store = 0, Unstore = 1
 
-temp_mode = client.read_input_registers(x,1)
-mode = temp_mode.getRegister(0)
-
-if mode ==0:
-	while True:
-		rec_reg = client.read_input_registers(y,1)
-		xRec = rec_reg.getRegister(0)
-		if xRec == 1:
-			sensor.read()
-			database.add_row()
-		if mode ==1:Break()
-
-if mode ==1:
-	while True:
-		list1 = cursor.execute(Update_status ==1)
-		for a in list1:
-			OutputLocation = a[0]
-			s_row_place = send_location%100%10
-    		s_row = send_location//10%10
-    		s_shelf = send_location//100
-        	client.write_registers(0, [9]*10)
-    		client.write_register(0,s_shelf)
-    		client.write_register(1,s_row)
-    		client.write_register(2,s_row_Place)
-    		if Unstore.done: continue()	
-    	#break on mode change 
-
-    Break on mode change 
-
-#break on mode change 
+while True:
+    mode = read_register(x)
+    if mode == 0:          
+        while True:
+            xRecognise = read_register(y)
+            if xRecognise == 1:
+                break
+        sensor()
+        add_row()
+    if mode ==1:
+        update()
+        a = list1[0]
+        outLocation = a[0]
+        s_row_place = send_location%100%10
+        s_row = send_location//10%10
+        s_shelf = send_location//100         
+        client.write_register(0,s_shelf)
+        client.write_register(1,s_row)
+        client.write_register(2,s_row_Place)
+        while True:
+            xDone = read_register(z)
+            if xDone == 1:
+                break
+        remove()
