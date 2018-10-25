@@ -67,25 +67,30 @@ cursor = db.cursor()
 
 
 def add_row(temp, location): 
-	date_and_time=(time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:%S"))    
-	query = ("""insert into test1(Date_and_Time, Temp, Target_Time, Status, Location) values (%s,%s,%s,%s,%s)""", (date_and_time, temp,Target_Time(temp),0,location()))
-	cursor.execute(*query)
-	db.commit()
+    date_and_time=(time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:%S"))    
+    query = ("""insert into test1(Date_and_Time, Temp, Target_Time, Status, Location) values (%s,%s,%s,%s,%s)""", (date_and_time, temp,Target_Time(temp),0,location()))
+    cursor.execute(*query)
+    db.commit()
 
 def removefromdb():
-	remove='DELETE TOP (1) FROM test1 WHERE status =1'   
-	cursor.execute(*remove)
-	db.commit()
+    remove='DELETE TOP (1) FROM test1 WHERE status =1'   
+    cursor.execute(*remove)
+    db.commit()
 
 def update():
-	query='select Location from test1 where Status=1'
-	cursor.execute(*query)
-	x=cursor[0]
-	return x[0]
+    query='select Location from test1 where Status=1'
+    cursor.execute(query)
+    res = cursor.fetchall()
+    return res[0][0]
 
 def mode():
-	query='select count(Location) from test1 where Status=1'
-	cursor
+    query='select count(Location) from test1 where Status=1'
+    result = cursor.fetchall()
+    if (result[0][0] != 0):
+        mode = 1
+    else:
+        mode = 0
+    return mode
 
 #Modbus Connection initialise 
 client = ModbusClient(host = '192.168.178.10',port  = 502)          ##Modbus connection establish 
@@ -93,21 +98,19 @@ client.connect()
 client.write_registers(0, [9]*10)                                                  ##Open Connection
 
 #mode :Store = 0, Unstore = 1
-
+mode = 99
 while True:
-    mode = mode_selection()##result of the mode query
+    mode = mode()##result of the mode query
     if mode == 0:          
         while True:
             xRecognise = read_register(y)
             if xRecognise == 1:
                 break
-        temp = sensor_read() ##this too
-        add_row(temp)  ##make sure this runs
+        temp = sensor_read()
+        add_row(temp)  
         
     if mode ==1:
-        update() ##this too
-        a = list1[0]
-        outLocation = a[0]
+        send_location = update()
         s_row_place = send_location%100%10
         s_row = send_location//10%10
         s_shelf = send_location//100         
@@ -118,4 +121,4 @@ while True:
             xDone = read_register(z)
             if xDone == 1:
                 break
-        removefromdb()##only the first element with status == 1 and has been removed already from cpps)##this is the last query
+        removefromdb()
