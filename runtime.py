@@ -78,11 +78,14 @@ def removefromdb():
 	db.commit()
 
 def update():
-	query='select location from test1 where Status=1'
+	query='select Location from test1 where Status=1'
 	cursor.execute(*query)
 	x=cursor[0]
 	return x[0]
 
+def mode():
+	query='select count(Location) from test1 where Status=1'
+	cursor
 
 #Modbus Connection initialise 
 client = ModbusClient(host = '192.168.178.10',port  = 502)          ##Modbus connection establish 
