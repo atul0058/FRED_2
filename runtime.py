@@ -78,10 +78,8 @@ def removefromdb():
 def update():
 	query='select location from test1 where Status=1'
 	cursor.execute(*query)
-	x=[]
-	for i in cursor:
-		x.append(print(i[0]))
-	return x
+	x=curosr[0]
+	return x[0]
 
 def mode:
 	
