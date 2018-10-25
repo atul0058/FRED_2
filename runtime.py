@@ -10,6 +10,8 @@ import math
 import smbus
 import time
 from pymodbus.client.sync import ModbusTcpClient as ModbusClient
+from datetime import timedelta
+
 
 #All the Funtions are here 
 def cooling_time(Ti):
@@ -31,11 +33,11 @@ def cooling_time(Ti):
     
     return time
 
-def target_time(Ti):
+def Target_Time(Ti):
     d1= datetime.datetime.now()
     delta_t=cooling_time(Ti)
-    new_time=d1 + datetime.timedelta(0,delta_t)+2400
-    #FRED takes 2400 seconds to reach the desired temp
+    new_time=d1 + datetime.timedelta(0,delta_t)+datetime.timedelta(0,2400)
+    #FRED takes 2400 seconds to reach the desired temperature
     return new_time
 
 def read_register(reg_no):
@@ -78,15 +80,14 @@ def removefromdb():
 def update():
 	query='select location from test1 where Status=1'
 	cursor.execute(*query)
-	x=curosr[0]
+	x=cursor[0]
 	return x[0]
 
-def mode:
-	
+
 #Modbus Connection initialise 
 client = ModbusClient(host = '192.168.178.10',port  = 502)          ##Modbus connection establish 
 client.connect() 
-client.write_registers(0, [9]*10)                                                  ##Open COnnection
+client.write_registers(0, [9]*10)                                                  ##Open Connection
 
 #mode :Store = 0, Unstore = 1
 
