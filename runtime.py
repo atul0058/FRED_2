@@ -73,7 +73,7 @@ def add_row(temp, location):
     db.commit()
 
 def removefromdb():
-    remove='DELETE TOP (1) FROM test1 WHERE status =1'   
+    remove='DELETE FROM test1 WHERE status =1 limit 1'   
     cursor.execute(*remove)
     db.commit()
 
