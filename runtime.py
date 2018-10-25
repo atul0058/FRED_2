@@ -65,7 +65,7 @@ def sensor_read():
 db = MySQLdb.connect(host="localhost", user="raspi", passwd="raspberry", db="test1")
 cursor = db.cursor()
 
-while True:
+def statusupdate():
     query='update test1 set Status=1 where Current_TIMESTAMP>=Target_Time'
     cursor.execute(*query)
     db.commit()
@@ -105,6 +105,7 @@ client.write_registers(0, [9]*10)                                               
 mode = 99
 while True:
     mode = mode()##result of the mode query
+    statusupdate()
     if mode == 0:          
         while True:
             xRecognise = read_register(y)
