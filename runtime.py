@@ -52,11 +52,11 @@ def rcv_location():
 
 def sensor_read():
     bus=smbus.SMBus(1)
-        bus.write_i2c_block_data(0x44, 0x2c, [0x06])
-        time.sleep(0.5)
-        data = bus.read_i2c_block_data(0x44, 0x00, 6)
-        temp=data[0] * 256 + data[1]
-        cTemp = -45 + (175*temp/65535.0)
+    bus.write_i2c_block_data(0x44, 0x2c, [0x06])
+    time.sleep(0.5)
+    data = bus.read_i2c_block_data(0x44, 0x00, 6)
+    temp=data[0] * 256 + data[1]
+    cTemp = -45 + (175*temp/65535.0)
     return cTemp
 
 # Connect with DB
@@ -66,7 +66,7 @@ cursor = db.cursor()
 
 def add_row(temp, location): 
 	date_and_time=(time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:%S"))    
-	query = ("""insert into test1(Date_and_Time, Temp, Target_Time, Status, Location) values (%s,%s,%s,%s,%s)""", (date_and_time, temp,Target_Time(temp),0,location())
+	query = ("""insert into test1(Date_and_Time, Temp, Target_Time, Status, Location) values (%s,%s,%s,%s,%s)""", (date_and_time, temp,Target_Time(temp),0,location()))
 	cursor.execute(*query)
 	db.commit()
 
@@ -74,7 +74,17 @@ def removefromdb():
 	remove='DELETE TOP (1) FROM test1 WHERE status =1'   
 	cursor.execute(*remove)
 	db.commit()
-    
+
+def update():
+	query='select location from test1 where Status=1'
+	cursor.execute(*query)
+	x=[]
+	for i in cursor:
+		x.append(print(i[0]))
+	return x
+
+def mode:
+	
 #Modbus Connection initialise 
 client = ModbusClient(host = '192.168.178.10',port  = 502)          ##Modbus connection establish 
 client.connect() 
