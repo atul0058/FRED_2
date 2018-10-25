@@ -92,7 +92,7 @@ client.write_registers(0, [9]*10)                                               
 #mode :Store = 0, Unstore = 1
 
 while True:
-    mode = read_register(x)
+    mode = mode_selection()##result of the mode query
     if mode == 0:          
         while True:
             xRecognise = read_register(y)
