@@ -65,6 +65,10 @@ def sensor_read():
 db = MySQLdb.connect(host="localhost", user="raspi", passwd="raspberry", db="test1")
 cursor = db.cursor()
 
+while True:
+    query='update test1 set Status=1 where Current_TIMESTAMP>=Target_Time'
+    cursor.execute(*query)
+    db.commit()
 
 def add_row(temp, location): 
     date_and_time=(time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:%S"))    
