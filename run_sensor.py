@@ -16,3 +16,4 @@ loopcount += 1
 time.sleep(2)
 
 #Source: https://cdn-learn.adafruit.com/downloads/pdf/adafruit-sht31-d-temperature-and-humidity-sensor-breakout.pdf
+#sudo python3 runsensor.py
