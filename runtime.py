@@ -1,7 +1,6 @@
 # Import all the needed modules
-import board
-import busio
-import adafruit_sht31
+import smbus
+import time
 import os
 import time
 import datetime
@@ -54,10 +53,16 @@ def rcv_location():
     return location
 
 def sensor_read():
-    # Create library object using our Bus I2C port
-    i2c = busio.I2C(board.SCL, board.SDA)
-    sensor = adafruit_sht31.SHT31(i2c)
-    cTemp=sensor.temperature
+    bus=smbus.SMBus(1)
+    bus.write_i2c_block_data(0x44, 0x2c, [0x06])
+    time.sleep(0.5)
+    #SHT31 adress, 0x44(68)
+    #Read data back from 0x00(00), 6 bytes
+    #Temp MSB, temp LSB, Temp CRC, Humidity MSB, Humidity LSB , Humidity CRC
+    data = bus.read_i2c_block_data(0x44, 0x00, 6)
+    #Convert the data
+    temp=data[0] * 256 + data[1]
+    cTemp = -45 + (175*temp/65535.0)
     return cTemp
 
 # Connect with DB
