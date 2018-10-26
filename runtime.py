@@ -1,8 +1,7 @@
 # Import all the needed modules
-import smbus
-import time
 import os
 import time
+import smbus
 import datetime
 import glob
 import MySQLdb
@@ -51,7 +50,6 @@ def rcv_location():
     row_place = read_register(2)
     location = (shelf*100) + (row*10)+ row_place
     return location
-
 def sensor_read():
     bus=smbus.SMBus(1)
     bus.write_i2c_block_data(0x44, 0x2c, [0x06])
@@ -64,6 +62,7 @@ def sensor_read():
     temp=data[0] * 256 + data[1]
     cTemp = -45 + (175*temp/65535.0)
     return cTemp
+
 
 # Connect with DB
 db = MySQLdb.connect(host="localhost", user="raspi", passwd="raspberry", db="test1")
@@ -108,17 +107,18 @@ client.write_registers(0, [9]*10)                                               
 #mode :Store = 0, Unstore = 1
 mode = 99
 while True:
-    mode = mode()##result of the mode query
     statusupdate()
+    mode = mode()##result of the mode query
     if mode == 0:          
         while True:
-            xRecognise = read_register(y)
-            if xRecognise == 1:
+            xStartRec = read_register(3)
+            if xStartRec == 0:
                 break
         temp = sensor_read()
         add_row(temp)  
         
     if mode ==1:
+        
         send_location = update()
         s_row_place = send_location%100%10
         s_row = send_location//10%10
@@ -126,8 +126,12 @@ while True:
         client.write_register(0,s_shelf)
         client.write_register(1,s_row)
         client.write_register(2,s_row_Place)
+        client.write_register(3,1)
+        time.sleep(1)
+        client.write_register(3,0)
+        
         while True:
-            xDone = read_register(z)
-            if xDone == 1:
+            xStart = read_register(4)
+            if xStart == 0:
                 break
         removefromdb()
