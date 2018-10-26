@@ -1,5 +1,7 @@
 # Import all the needed modules
-
+import board
+import busio
+import adafruit_sht31
 import os
 import time
 import datetime
@@ -8,7 +10,6 @@ import MySQLdb
 from time import strftime
 import math
 import smbus
-import time
 from pymodbus.client.sync import ModbusTcpClient as ModbusClient
 from datetime import timedelta
 
@@ -53,12 +54,10 @@ def rcv_location():
     return location
 
 def sensor_read():
-    bus=smbus.SMBus(1)
-    bus.write_i2c_block_data(0x44, 0x2c, [0x06])
-    time.sleep(0.5)
-    data = bus.read_i2c_block_data(0x44, 0x00, 6)
-    temp=data[0] * 256 + data[1]
-    cTemp = -45 + (175*temp/65535.0)
+    # Create library object using our Bus I2C port
+    i2c = busio.I2C(board.SCL, board.SDA)
+    sensor = adafruit_sht31.SHT31(i2c)
+    cTemp=sensor.temperature
     return cTemp
 
 # Connect with DB
