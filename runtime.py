@@ -75,7 +75,7 @@ def statusupdate():
 
 def add_row(temp, location): 
     date_and_time=(time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:%S"))    
-    query = ("""insert into test1(Date_and_Time, Temp, Target_Time, Status, Location) values (%s,%s,%s,%s,%s)""", (date_and_time, temp,Target_Time(temp),0,location()))
+    query = ("""insert into test1(Date_and_Time, Temperature, Target_Time, Status, Location) values (%s,%s,%s,%s,%s)""", (date_and_time, temp,Target_Time(temp),0,location()))
     cursor.execute(*query)
     db.commit()
 
