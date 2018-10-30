@@ -100,6 +100,29 @@ def mode_selection():
         mode = 0
     return mode
 
+def merge_rows():
+    query1 ='SELECT Date_and_Time ,Location, Target_Time, Status  FROM test1 ORDER BY ID desc  LIMIT 1' 
+    cursor.execute(query1)
+    result1 = cursor.fetchall()
+    merge_date = result1[0][0]
+    merge_loc = result1[0][1]
+    merge_target = result1[0][2]
+    merge_status = result1[0][3]
+
+    query2 = 'select avg(Temperature) from test1 where Location ='  + str(merge_loc)
+    cursor.execute(query2)
+    result = cursor.fetchall()
+    avg = result[0][0]
+    
+    query3 = 'delete from test1 where Location = ' + str(merge_loc)
+    cursor.execute(query3)
+    db.commit()
+
+    query4 = query = ("""insert into test1(Date_and_Time, Temperature, Target_Time, Status, Location) values (%s,%s,%s,%s,%s)""", (merge_date, avg ,merge_target,merge_status,merge_loc))
+    cursor.execute(*query4)
+    db.commit()
+
+
 #Modbus Connection initialise 
 client = ModbusClient(host = '192.168.178.10',port  = 502)          ##Modbus connection establish 
 client.connect() 
@@ -108,6 +131,7 @@ client.write_registers(0, [0]*10)                                               
 #mode :Store = 0, Unstore = 1
 while True:
     while True:
+        merge_rows()
         statusupdate()
         mode = mode_selection()##result of the mode query
         if mode == 0:          
