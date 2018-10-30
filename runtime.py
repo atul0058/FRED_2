@@ -119,7 +119,7 @@ def merge_rows():
     db.commit()
 
     query4 = query = ("""insert into test1(Date_and_Time, Temperature, Target_Time, Status, Location) values (%s,%s,%s,%s,%s)""", (merge_date, avg ,merge_target,merge_status,merge_loc))
-    cursor.execute(*query4)
+    cursor.execute(query4)
     db.commit()
 
 
