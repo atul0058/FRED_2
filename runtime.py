@@ -46,6 +46,7 @@ def read_register(reg_no):
 
 def rcv_location():
     shelf = read_register(0)
+    shelf = shelf + 1
     row = read_register(1)
     row_place = read_register(2)
     location = (shelf*100) + (row*10)+ row_place
@@ -70,18 +71,18 @@ cursor = db.cursor()
 
 def statusupdate():
     query='update test1 set Status=1 where Current_TIMESTAMP>=Target_Time'
-    cursor.execute(*query)
+    cursor.execute(query)
     db.commit()
 
-def add_row(temp, location): 
+def add_row(temp): 
     date_and_time=(time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:%S"))    
-    query = ("""insert into test1(Date_and_Time, Temperature, Target_Time, Status, Location) values (%s,%s,%s,%s,%s)""", (date_and_time, temp,Target_Time(temp),0,location()))
+    query = ("""insert into test1(Date_and_Time, Temperature, Target_Time, Status, Location) values (%s,%s,%s,%s,%s)""", (date_and_time, temp,Target_Time(temp),0,rcv_location()))
     cursor.execute(*query)
     db.commit()
 
 def removefromdb():
     remove='DELETE FROM test1 WHERE status =1 limit 1'   
-    cursor.execute(*remove)
+    cursor.execute(remove)
     db.commit()
 
 def update():
@@ -90,8 +91,9 @@ def update():
     res = cursor.fetchall()
     return res[0][0]
 
-def mode():
+def mode_selection():
     query='select count(Location) from test1 where Status=1'
+    cursor.execute(query)
     result = cursor.fetchall()
     if (result[0][0] != 0):
         mode = 1
@@ -102,36 +104,41 @@ def mode():
 #Modbus Connection initialise 
 client = ModbusClient(host = '192.168.178.10',port  = 502)          ##Modbus connection establish 
 client.connect() 
-client.write_registers(0, [9]*10)                                                  ##Open Connection
+client.write_registers(0, [0]*10)                                                  ##Open Connection
 
 #mode :Store = 0, Unstore = 1
-mode = 99
 while True:
-    statusupdate()
-    mode = mode()##result of the mode query
-    if mode == 0:          
-        while True:
-            xStartRec = read_register(3)
-            if xStartRec == 0:
-                break
-        temp = sensor_read()
-        add_row(temp)  
+    while True:
+        statusupdate()
+        mode = mode_selection()##result of the mode query
+        if mode == 0:          
+            while True:
+                xStartRec = read_register(3)
+                if xStartRec == 0:
+                    break
+            time.sleep(90)
+            temp = sensor_read()
+            add_row(temp)  
+            break
+        if mode ==1:
         
-    if mode ==1:
+            send_location = update()
+            s_row_Place = send_location%100%10
+            s_row = send_location//10%10
+            s_shelf = send_location//100
+            s_shelf = s_shelf-1
+            s_row = s_row - 1
+            s_row_Place = s_row_Place - 1         
+            client.write_register(0,s_shelf)
+            client.write_register(1,s_row)
+            client.write_register(2,s_row_Place)
+            client.write_register(3,1)
+            time.sleep(1)
+            client.write_register(3,0)
         
-        send_location = update()
-        s_row_place = send_location%100%10
-        s_row = send_location//10%10
-        s_shelf = send_location//100         
-        client.write_register(0,s_shelf)
-        client.write_register(1,s_row)
-        client.write_register(2,s_row_Place)
-        client.write_register(3,1)
-        time.sleep(1)
-        client.write_register(3,0)
-        
-        while True:
-            xStart = read_register(4)
-            if xStart == 0:
-                break
-        removefromdb()
+            while True:
+                xStart = read_register(4)
+                if xStart == 0:
+                    break
+            removefromdb()
+            break
