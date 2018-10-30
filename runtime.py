@@ -45,10 +45,9 @@ def read_register(reg_no):
     return val
 
 def rcv_location():
-    shelf = read_register(0)
-    shelf = shelf + 1
-    row = read_register(1)
-    row_place = read_register(2)
+    shelf = read_register(0) + 1 
+    row = read_register(1) + 1 
+    row_place = read_register(2) + 1 
     location = (shelf*100) + (row*10)+ row_place
     return location
 def sensor_read():
@@ -116,7 +115,6 @@ while True:
                 xStartRec = read_register(3)
                 if xStartRec == 0:
                     break
-            time.sleep(90)
             temp = sensor_read()
             add_row(temp)  
             break
