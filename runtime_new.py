@@ -76,9 +76,21 @@ def statusupdate():
 
 def add_row(temp): 
     date_and_time=(time.strftime("%Y-%m-%d ") + time.strftime("%H:%M:%S"))    
-    query = ("""insert into test1(Date_and_Time, Temperature, Target_Time, Status, Location) values (%s,%s,%s,%s,%s)""", (date_and_time, temp,Target_Time(temp),0,rcv_location()))
+    query = ("""insert into test1(Date_and_Time, Temperature, Target_Time, Status, Location, Colour) values (%s,%s,%s,%s,%s,%s)""", (date_and_time, temp,Target_Time(temp),0,rcv_location(),colour()))
     cursor.execute(*query)
     db.commit()
+
+def colour():
+    colour_data = read_register(5)
+    if colour_data == 0: 
+        colour = 'Red'
+    if colour_data == 1: 
+        colour = 'Black'
+    if colour_data == 2: 
+        colour = 'Silver'
+    return colour
+    
+
 
 def removefromdb():
     remove='DELETE FROM test1 WHERE status =1 limit 1'   
@@ -102,13 +114,14 @@ def mode_selection():
     return mode
 
 def merge_rows():
-    query1 ='SELECT Date_and_Time ,Location, Target_Time, Status  FROM test1 ORDER BY ID desc  LIMIT 1' 
+    query1 ='SELECT Date_and_Time ,Location, Target_Time, Status, Colour  FROM test1 ORDER BY ID desc  LIMIT 1' 
     cursor.execute(query1)
     result1 = cursor.fetchall()
     merge_date = result1[0][0]
     merge_loc = result1[0][1]
     merge_target = result1[0][2]
     merge_status = result1[0][3]
+    merge_colour = result1[0][4]
 
     query2 = 'select avg(Temperature) from test1 where Location ='  + str(merge_loc)
     cursor.execute(query2)
@@ -119,7 +132,7 @@ def merge_rows():
     cursor.execute(query3)
     db.commit()
 
-    query4 = query = ("""insert into test1(Date_and_Time, Temperature, Target_Time, Status, Location) values (%s,%s,%s,%s,%s)""", (merge_date, avg ,merge_target,merge_status,merge_loc))
+    query4 = query = ("""insert into test1(Date_and_Time, Temperature, Target_Time, Status, Location, Colour) values (%s,%s,%s,%s,%s,%s)""", (merge_date, avg ,merge_target,merge_status,merge_loc,merge_colour))
     cursor.execute(*query4)
     db.commit()
 
@@ -130,45 +143,48 @@ client.connect()
 client.write_registers(0, [0]*10)                                                  ##Open Connection
 
 #mode :Store = 0, Unstore = 1
-while True:
-    mode = mode_selection()
+try:
     while True:
-        #merge_rows()
-        statusupdate()
-        #mode = mode_selection()##result of the mode query
-        print mode
-        
-        sys.stdout.flush()
-        if mode == 0:          
-            while True:
-                xStartRec = read_register(3)
-                if xStartRec == 0:
-                    break
-            temp = sensor_read()
-            add_row(temp)
-            merge_rows()
-            break
+        mode = mode_selection()
+        while True:
+            #merge_rows()
+            statusupdate()
+            #mode = mode_selection()##result of the mode query
+            print mode
             
-        if mode ==1:
-            time.sleep(45)
-            send_location = update()
-            s_row_Place = send_location%100%10
-            s_row = send_location//10%10
-            s_shelf = send_location//100
-            s_shelf = s_shelf-1
-            s_row = s_row - 1
-            s_row_Place = s_row_Place - 1         
-            client.write_register(0,s_shelf)
-            client.write_register(1,s_row)
-            client.write_register(2,s_row_Place)
-            print 'Unstoring Item on '+ str(send_location)
-            client.write_register(3,1)
-            time.sleep(3)
-            client.write_register(3,0)
-        
-            while True:
-                xStart = read_register(4)
-                if xStart == 0:
-                    break
-            removefromdb()
-            break
+            sys.stdout.flush()
+            if mode == 0:          
+                while True:
+                    xStartRec = read_register(3)
+                    if xStartRec == 0:
+                        break
+                temp = sensor_read()
+                add_row(temp)
+                merge_rows()
+                break
+                
+            if mode ==1:
+                time.sleep(45)
+                send_location = update()
+                s_row_Place = send_location%100%10
+                s_row = send_location//10%10
+                s_shelf = send_location//100
+                s_shelf = s_shelf-1
+                s_row = s_row - 1
+                s_row_Place = s_row_Place - 1         
+                client.write_register(0,s_shelf)
+                client.write_register(1,s_row)
+                client.write_register(2,s_row_Place)
+                print 'Unstoring Item on '+ str(send_location)
+                client.write_register(3,1)
+                time.sleep(3)
+                client.write_register(3,0)
+            
+                while True:
+                    xStart = read_register(4)
+                    if xStart == 0:
+                        break
+                removefromdb()
+                break
+except Exception, e1:
+    print "Error communicating...: " + str(e1)
