@@ -90,7 +90,15 @@ def colour():
         colour = 'Silver'
     return colour
     
+def visuAdd():
+    query = ("""insert into LastAdded(Location, Colour) values (%s,%s)""", (rcv_location(),colour()))
+    cursor.execute(*query)
+    db.commit()
 
+def visuRemove(Location):
+    query = ("""insert into LastRemoved(Location) values (%s)""", [location])
+    cursor.execute(*query)
+    db.commit()
 
 def removefromdb():
     remove='DELETE FROM test1 WHERE status =1 limit 1'   
@@ -160,7 +168,9 @@ try:
                         break
                 temp = sensor_read()
                 add_row(temp)
+                visuAdd()
                 merge_rows()
+
                 break
                 
             if mode ==1:
@@ -179,7 +189,7 @@ try:
                 client.write_register(3,1)
                 time.sleep(3)
                 client.write_register(3,0)
-            
+                visuRemove(send_location)
                 while True:
                     xStart = read_register(4)
                     if xStart == 0:
