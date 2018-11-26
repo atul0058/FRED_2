@@ -153,48 +153,53 @@ client.write_registers(0, [0]*10)                                               
 #mode :Store = 0, Unstore = 1
 try:
     while True:
-        mode = mode_selection()
-        while True:
-            #merge_rows()
-            statusupdate()
-            #mode = mode_selection()##result of the mode query
-            print mode
-            
-            sys.stdout.flush()
-            if mode == 0:          
-                while True:
-                    xStartRec = read_register(3)
-                    if xStartRec == 0:
-                        break
-                temp = sensor_read()
-                add_row(temp)
-                visuAdd()
-                merge_rows()
+        if client.connect():        
+            mode = mode_selection()
+            while True:
+                #merge_rows()
+                statusupdate()
+                #mode = mode_selection()##result of the mode query
+                print mode
 
-                break
-                
-            if mode ==1:
-                time.sleep(45)
-                send_location = update()
-                s_row_Place = send_location%100%10
-                s_row = send_location//10%10
-                s_shelf = send_location//100
-                s_shelf = s_shelf-1
-                s_row = s_row - 1
-                s_row_Place = s_row_Place - 1         
-                client.write_register(0,s_shelf)
-                client.write_register(1,s_row)
-                client.write_register(2,s_row_Place)
-                print 'Unstoring Item on '+ str(send_location)
-                client.write_register(3,1)
-                time.sleep(3)
-                client.write_register(3,0)
-                visuRemove(send_location)
-                while True:
-                    xStart = read_register(4)
-                    if xStart == 0:
-                        break
-                removefromdb()
-                break
+                sys.stdout.flush()
+                if mode == 0:          
+                    while True:
+                        xStartRec = read_register(3)
+                        if xStartRec == 0:
+                            break
+                    temp = sensor_read()
+                    add_row(temp)
+                    visuAdd()
+                    merge_rows()
+
+                    break
+
+                if mode ==1:
+                    time.sleep(45)
+                    send_location = update()
+                    s_row_Place = send_location%100%10
+                    s_row = send_location//10%10
+                    s_shelf = send_location//100
+                    s_shelf = s_shelf-1
+                    s_row = s_row - 1
+                    s_row_Place = s_row_Place - 1         
+                    client.write_register(0,s_shelf)
+                    client.write_register(1,s_row)
+                    client.write_register(2,s_row_Place)
+                    print 'Unstoring Item on '+ str(send_location)
+                    client.write_register(3,1)
+                    time.sleep(3)
+                    client.write_register(3,0)
+                    visuRemove(send_location)
+                    while True:
+                        xStart = read_register(4)
+                        if xStart == 0:
+                            break
+                    removefromdb()
+                    break
+
+        else:
+            time.sleep(180)
+
 except Exception, e1:
     print "Error communicating...: " + str(e1)
