@@ -149,7 +149,7 @@ def merge_rows():
 client = ModbusClient(host = '192.168.178.10',port  = 502)          ##Modbus connection establish 
 client.connect() 
 client.write_registers(0, [0]*10)                                                  ##Open Connection
-
+print "Initialising Startup Sequence..."
 #mode :Store = 0, Unstore = 1
 try:
     while True:
@@ -199,6 +199,7 @@ try:
                     break
 
         else:
+            print "Retrying to Connect! Please check MODBUS status."
             time.sleep(180)
 
 except Exception, e1:
