@@ -7,15 +7,15 @@ import time
 #Get I2C bus
 bus=smbus.SMBus(1)
 
-#SHT31 address, 0x44(68)
-bus.write_i2c_block_data(0x44, 0x2c, [0x06])
+#SHT31 address, 0x45(68)
+bus.write_i2c_block_data(0x45, 0x2c, [0x06])
 
 time.sleep(0.5)
 
 #SHT31 adress, 0x44(68)
 #Read data back from 0x00(00), 6 bytes
 #Temp MSB, temp LSB, Temp CRC, Humidity MSB, Humidity LSB , Humidity CRC
-data = bus.read_i2c_block_data(0x44, 0x00, 6)
+data = bus.read_i2c_block_data(0x45, 0x00, 6)
 
 
 #Convert the data
