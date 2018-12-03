@@ -5,3 +5,8 @@ use test1; #test1 is the name of the database
 
 #name of the table is test1 and it has 7 coloumns-Id, Date and Time, Temperature, Target Time, Status, Location and Colour.
 create table test1(Id mediumint auto_increment not null, Date_and_Time datetime not null, Temperature float(5,2) not null, Target_Time DateTime not null, Status boolean not null, Location int not null, Colour VARCHAR(255) not null,Primary Key (Id));
+
+
+
+
+
